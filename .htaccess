@@ -1,0 +1,4 @@
+RewriteEngine on
+RewriteBase /
+RewriteRule (css|js|images|fonts|less)/.+$ - [L]
+RewriteRule	^(.*)$	index.php?__page=$1 [L,QSA]
