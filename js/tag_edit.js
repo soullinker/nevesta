@@ -35,13 +35,11 @@ function close_tag(event)
 
 function load_tag(event)
 {
-	
 	$.ajax({
 		url:'load_tag?id='+TAG_EDITOR.image_id
 	}).done(function( data ) {
 		fill_tag(data)
 	});
-
 }
 
 function fill_tag(data)
@@ -90,6 +88,14 @@ function init_filter(event)
 {
 	$('#content .taglist .tag').click(filter_switch)
 	$('#tagfilter').click(apply_filter)
+	$('#sortby').change(change_sort)
+}
+
+function change_sort(event)
+{
+	var sort = $(this).val()
+	$.cookie("sort", sort, { path: '/', expires: 7 });
+	location.reload();
 }
 
 function apply_filter(event)

@@ -21,8 +21,11 @@
 			?>
 			<br/>
 			<input type="button" id="tagfilter" value="apply filter" /> (use Ctrl+click to mark tag as banned)
+      <select id="sortby"><option value="like">like</option><option value="date" <?php
+        if ($PM->sort == SORT_DATE) echo "selected";
+      ?>>date</option></select>
 			<script type="text/javascript">
-				init_filter()
+        init_filter()
 			</script>
 		</div>
 

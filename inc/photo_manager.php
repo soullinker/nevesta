@@ -4,6 +4,8 @@ define('PHOTO_LIMIT', 20);
 define('PAGE_COUNT', 5);
 define('TAG_DELIMETER', ',');
 define('HASH_DELIMETER', ':');
+define('SORT_DATE', 'created_at');
+define('SORT_LIKE', 'likes');
 
 class Photo_Manager
 {
@@ -12,12 +14,14 @@ class Photo_Manager
 	var $tag = [];
 	var $page = 0;
 	var $filter = [];
+	var $sort = SORT_DATE;
 
 	function __construct()
 	{
 		$this->page = Input::cleanGPC('g', 'page', TYPE_INT);
 		if ($this->page == 0)
 			$this->page = 1;
+		$this->get_sort();
 	}
 
 	function get_count()
@@ -30,7 +34,7 @@ class Photo_Manager
 	{
 		$this->get_count();
 
-		$result = DB::read('SELECT id, user_id, src, created_at FROM `test-photo` ORDER BY created_at DESC LIMIT '.(($this->page-1) * PHOTO_LIMIT).','.PHOTO_LIMIT);
+		$result = DB::read('SELECT id, user_id, src, created_at FROM `test-photo` ORDER BY '.$this->sort.' DESC LIMIT '.(($this->page-1) * PHOTO_LIMIT).','.PHOTO_LIMIT);
 		while ($row = DB::fetch($result))
 			$this->list[] = $row;
 		DB::free($result);
@@ -41,7 +45,7 @@ class Photo_Manager
 		$this->apply_filter();
 		$this->count = count($this->filter);
 
-		$result = DB::read('SELECT id, user_id, src, created_at FROM `test-photo` WHERE id IN ('.join(',', $this->filter).') ORDER BY created_at DESC LIMIT '.(($this->page-1) * PHOTO_LIMIT).','.PHOTO_LIMIT);
+		$result = DB::read('SELECT id, user_id, src, created_at FROM `test-photo` WHERE id IN ('.join(',', $this->filter).') ORDER BY '.$this->sort.' DESC LIMIT '.(($this->page-1) * PHOTO_LIMIT).','.PHOTO_LIMIT);
 		while ($row = DB::fetch($result))
 			$this->list[] = $row;
 		DB::free($result);
@@ -122,6 +126,12 @@ class Photo_Manager
 	function unserialize($string)
 	{
 		return explode(HASH_DELIMETER, $string);
+	}
+
+	function get_sort()
+	{
+		if (Input::cleanGPC('c', 'sort', TYPE_STR) == 'like')
+			$this->sort = SORT_LIKE;
 	}
 
 	function apply_filter()
