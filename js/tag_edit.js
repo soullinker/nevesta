@@ -83,34 +83,71 @@ function tag_edit_start(event)
 
 
 var FILTER = [];
+var FILTER_EXCLUDE = [];
 
 function init_filter(event)
 {
-	$('#content .taglist .tag').click(function() {
-		filter_switch($(this))
-	})
+	$('#content .taglist .tag').click(filter_switch)
 	$('#tagfilter').click(apply_filter)
 }
 
 function apply_filter(event)
 {
 	$.cookie("filter", FILTER.join(','), { path: '/', expires: 7 });
+	$.cookie("filter_ban", FILTER_EXCLUDE.join(','), { path: '/', expires: 7 });
 	document.location = '/filter';
 }
 
-function filter_switch(tag_object)
+function in_array(needle, haystack)
 {
+	return haystack.indexOf(needle) != -1
+}
+
+function array_remove(needle, haystack)
+{
+	var index = haystack.indexOf(needle)
+	if (index != -1)
+		haystack.splice(index, 1)
+}
+
+function filter_switch(event)
+{
+	var tag_object = $(this)
 	var tagname = tag_object.attr('val')
-	console.log('Tag add: '+tagname);
-	var index = FILTER.indexOf(tagname)
-	if (index == -1)
+	var ban = event.ctrlKey
+
+	if (ban)
 	{
-		FILTER.push(tagname)
-		tag_object.addClass('allow')
+		array_remove(tagname, FILTER)
+		tag_object.removeClass('allow')
+
+		var index = FILTER_EXCLUDE.indexOf(tagname)
+		if (index == -1)
+		{
+			FILTER_EXCLUDE.push(tagname)
+			tag_object.addClass('ban')
+		}
+		else
+		{
+			FILTER_EXCLUDE.splice(index, 1)
+			tag_object.removeClass('ban')
+		}
 	}
 	else
 	{
-		FILTER.splice(index, 1)
-		tag_object.removeClass('allow')
+		array_remove(tagname, FILTER_EXCLUDE)
+		tag_object.removeClass('ban')
+		
+		var index = FILTER.indexOf(tagname)
+		if (index == -1)
+		{
+			FILTER.push(tagname)
+			tag_object.addClass('allow')
+		}
+		else
+		{
+			FILTER.splice(index, 1)
+			tag_object.removeClass('allow')
+		}
 	}
 }

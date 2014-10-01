@@ -133,9 +133,19 @@ class Photo_Manager
 		foreach ($filter as &$tagname)
 			$tagname = "'".DB::escape($tagname)."'";
 
+		$first = true;
+
 		$result = DB::read('SELECT idlist FROM tag WHERE name IN ('.join(',', $filter).')');
 		while ($row = DB::fetch($result))
-			$this->filter = array_merge($this->filter, $this->unserialize($row['idlist']));
+		{
+			if ($first)
+			{
+				$first = false;
+				$this->filter = $this->unserialize($row['idlist']);
+			}
+			else
+				$this->filter = array_intersect($this->filter, $this->unserialize($row['idlist']));
+		}
 		DB::free($result);
 	}
 

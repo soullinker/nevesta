@@ -450,6 +450,9 @@ header .header_top {
 #content .taglist .allow {
   background-color: rgba(100, 200, 100, 0.5);
 }
+#content .taglist .ban {
+  background-color: rgba(200, 100, 100, 0.5);
+}
 div.tagform {
   position: absolute;
   width: 400px;

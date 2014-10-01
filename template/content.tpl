@@ -20,7 +20,7 @@
 				echo $tag_block;
 			?>
 			<br/>
-			<input type="button" id="tagfilter" value="apply filter" />
+			<input type="button" id="tagfilter" value="apply filter" /> (use Ctrl+click to mark tag as banned)
 			<script type="text/javascript">
 				init_filter()
 			</script>
