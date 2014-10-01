@@ -1,7 +1,7 @@
 <?php
 
 define('PHOTO_LIMIT', 20);
-define('PAGE_LIMIT', 5);
+define('PAGE_COUNT', 5);
 define('TAG_DELIMETER', ',');
 define('HASH_DELIMETER', ':');
 
@@ -127,6 +127,8 @@ class Photo_Manager
 	function apply_filter()
 	{
 		$filter = Input::cleanGPC('c', 'filter', TYPE_STR);
+		$filter_ban = Input::cleanGPC('c', 'filter_ban', TYPE_STR);
+
 		if ($filter == '')
 			return false;
 		$filter = explode(',', $filter);
@@ -134,7 +136,6 @@ class Photo_Manager
 			$tagname = "'".DB::escape($tagname)."'";
 
 		$first = true;
-
 		$result = DB::read('SELECT idlist FROM tag WHERE name IN ('.join(',', $filter).')');
 		while ($row = DB::fetch($result))
 		{
@@ -147,6 +148,18 @@ class Photo_Manager
 				$this->filter = array_intersect($this->filter, $this->unserialize($row['idlist']));
 		}
 		DB::free($result);
+
+
+		$filter_ban = explode(',', $filter_ban);
+		foreach ($filter_ban as &$tagname)
+			$tagname = "'".DB::escape($tagname)."'";
+		$result = DB::read('SELECT idlist FROM tag WHERE name IN ('.join(',', $filter_ban).')');
+		while ($row = DB::fetch($result))
+		{
+			$this->filter = array_diff($this->filter, $this->unserialize($row['idlist']));
+		}
+		DB::free($result);
+
 	}
 
 	function tag_remove_id($tagname, $id)
@@ -180,7 +193,7 @@ class Photo_Manager
 		$html_pager = '';
 
 		$page_count = floor(($this->count-1) / PHOTO_LIMIT);
-		if ($page_count < PAGE_LIMIT)
+		if ($page_count < PAGE_COUNT)
 		{
 			for ($i = 1; $i <= $page_count+1; $i++)
 			{
@@ -192,7 +205,10 @@ class Photo_Manager
 		}
 		else
 		{
-			for ($i = 1; $i <= PAGE_LIMIT; $i++)
+			$start = $this->page - 3;
+			if ($start <= 1)
+				$start = 1;
+			for ($i = $start; $i <= $start + PAGE_COUNT + 1; $i++)
 			{
 				if ($i == $this->page)
 					$html_pager .= '<a href="#" class="page_btn active" onclick="return false;">'.$i.'</a>';

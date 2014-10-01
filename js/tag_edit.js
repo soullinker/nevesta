@@ -49,6 +49,7 @@ function fill_tag(data)
 	TAG_EDITOR.html.tags.val(data)
 	TAG_EDITOR.html.tags.prop('disabled', false);
 	TAG_EDITOR.html.save.prop('disabled', false);
+	TAG_EDITOR.html.tags.focus()
 }
 
 function save_tag(event)
